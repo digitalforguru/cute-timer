@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pastel Timer</title>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f7f1e8;
+    color: #b34a69;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  h1 {
+    margin-bottom: 20px;
+  }
+  select, button {
+    font-size: 1.2rem;
+    padding: 10px 15px;
+    border-radius: 9999px;
+    border: none;
+    background-color: #fcddec;
+    color: #b34a69;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+  }
+  select:hover, button:hover {
+    background-color: #f9bbca;
+  }
+  #time {
+    font-size: 4rem;
+    margin-top: 40px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<h1>⏰ Cute Pastel Timer</h1>
+<div>
+  <select id="minutes">
+    <option value="5">5 min</option>
+    <option value="10">10 min</option>
+    <option value="15">15 min</option>
+    <option value="20">20 min</option>
+    <option value="30">30 min</option>
+  </select>
+  <button id="start">Start</button>
+  <button id="reset">Reset</button>
+</div>
+<div id="time">00:00</div>
+
+<script>
+  const startBtn = document.getElementById('start');
+  const resetBtn = document.getElementById('reset');
+  const timeDisplay = document.getElementById('time');
+  const minutesSelect = document.getElementById('minutes');
+
+  let countdown;
+  let totalSeconds = 0;
+  let remainingSeconds = 0;
+
+  function updateDisplay(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    timeDisplay.textContent = `${m}:${s}`;
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    totalSeconds = parseInt(minutesSelect.value) * 60;
+    remainingSeconds = totalSeconds;
+    updateDisplay(remainingSeconds);
+    countdown = setInterval(() => {
+      remainingSeconds--;
+      updateDisplay(remainingSeconds);
+      if (remainingSeconds <= 0) {
+        clearInterval(countdown);
+        alert('⏰ Time’s up! Take a break 💖');
+      }
+    }, 1000);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    remainingSeconds = 0;
+    updateDisplay(0);
+  });
+
+  updateDisplay(0);
+</script>
+</body>
+</html>
