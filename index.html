@@ -5,79 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Focus Time</title>
 <style>
-  body {
-  display: flex;
-  justify-content: center;  /* centers horizontally */
-  align-items: center;      /* centers vertically */
-  height: 100vh;            /* full viewport height */
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f1e8;
-  color: #b34a69;
-  flex-direction: column;   /* stack content vertically */
-}
+  /* Wrapper to control size and aspect ratio */
+  .widget-wrapper {
+    width: 100%;
+    max-width: 350px;          /* max width to keep it small */
+    aspect-ratio: 4 / 3;       /* maintain height proportional to width */
+    margin: 0 auto;            /* center horizontally */
+    overflow: hidden;
+    background: #f7f1e8;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 12px rgba(179, 74, 105, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    color: #b34a69;
+  }
 
-#time {
-  font-size: 2rem;          /* smaller size */
-  margin-top: 20px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-align: center;
-}
+  h1 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+  }
 
-div {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 15px;
-}
+  select, button {
+    font-size: 1rem;           /* relative smaller font */
+    padding: 8px 12px;
+    border-radius: 9999px;
+    border: none;
+    background-color: #fcddec;
+    color: #b34a69;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+  }
+  select:hover, button:hover {
+    background-color: #f9bbca;
+  }
 
-select, button {
-  font-size: 1rem;          /* smaller buttons */
-  padding: 8px 12px;
-  border-radius: 9999px;
-  border: none;
-  background-color: #fcddec;
-  color: #b34a69;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+  #time {
+    font-size: 2.5rem;         /* smaller but still visible */
+    margin-top: 30px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
 
-select:hover, button:hover {
-  background-color: #f9bbca;
-}
-
-h1 {
-  font-size: 1.5rem;        /* smaller heading */
-  margin-bottom: 10px;
-  text-align: center;
-}
+  /* Responsive text scaling */
+  @media (max-width: 400px) {
+    .widget-wrapper {
+      max-width: 90vw;
+      padding: 15px;
+    }
+    h1 {
+      font-size: 1.3rem;
+    }
+    select, button {
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      margin: 0 3px;
+    }
+    #time {
+      font-size: 2rem;
+      margin-top: 20px;
+    }
+  }
 </style>
 </head>
 <body>
-<h1> ⊹₊⟡⋆ focus time ⊹₊⟡⋆  </h1>
-<div>
-  <select id="minutes">
-    <option value="5">5 min</option>
-    <option value="10">10 min</option>
-    <option value="15">15 min</option>
-    <option value="20">20 min</option>
-    <option value="30">30 min</option>
-  </select>
-  <button id="start">Start</button>
-  <button id="reset">Reset</button>
-</div>
-<div id="time">00:00</div>
-
-<!-- Added audio element here -->
-<audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
+  <div class="widget-wrapper">
+    <h1>⊹₊⟡⋆ focus time ⋆⟡₊⊹</h1>
+    <div>
+      <select id="minutes">
+        <option value="5">5 min</option>
+        <option value="10">10 min</option>
+        <option value="15">15 min</option>
+        <option value="20">20 min</option>
+        <option value="30">30 min</option>
+      </select>
+      <button id="start">Start</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div id="time">00:00</div>
+  </div>
 
 <script>
   const startBtn = document.getElementById('start');
   const resetBtn = document.getElementById('reset');
   const timeDisplay = document.getElementById('time');
   const minutesSelect = document.getElementById('minutes');
-  const alarmSound = document.getElementById('alarm-sound');
 
   let countdown;
   let totalSeconds = 0;
@@ -94,14 +111,11 @@ h1 {
     totalSeconds = parseInt(minutesSelect.value) * 60;
     remainingSeconds = totalSeconds;
     updateDisplay(remainingSeconds);
-
     countdown = setInterval(() => {
       remainingSeconds--;
       updateDisplay(remainingSeconds);
-
       if (remainingSeconds <= 0) {
         clearInterval(countdown);
-        alarmSound.play(); // Play the soft alarm sound here
         alert('time’s up! take a break .𖥔 ݁ ˖');
       }
     }, 1000);
