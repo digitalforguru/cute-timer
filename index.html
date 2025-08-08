@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pastel Timer</title>
+<title>Focus Time</title>
 <style>
   body {
     font-family: 'Inter', sans-serif;
@@ -56,11 +56,15 @@
 </div>
 <div id="time">00:00</div>
 
+<!-- Added audio element here -->
+<audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
+
 <script>
   const startBtn = document.getElementById('start');
   const resetBtn = document.getElementById('reset');
   const timeDisplay = document.getElementById('time');
   const minutesSelect = document.getElementById('minutes');
+  const alarmSound = document.getElementById('alarm-sound');
 
   let countdown;
   let totalSeconds = 0;
@@ -77,11 +81,14 @@
     totalSeconds = parseInt(minutesSelect.value) * 60;
     remainingSeconds = totalSeconds;
     updateDisplay(remainingSeconds);
+
     countdown = setInterval(() => {
       remainingSeconds--;
       updateDisplay(remainingSeconds);
+
       if (remainingSeconds <= 0) {
         clearInterval(countdown);
+        alarmSound.play(); // Play the soft alarm sound here
         alert('time’s up! take a break .𖥔 ݁ ˖');
       }
     }, 1000);
