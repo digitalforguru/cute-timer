@@ -149,7 +149,7 @@
 <body>
 
 <div class="widget-wrapper" id="widget">
-  <h1>---- focus timer ----</h1>
+  <h1>.𖥔 focus timer .𖥔</h1>
   <div>
     <select id="minutes">
       <option value="5">5 min</option>
@@ -177,6 +177,14 @@
 
   <!-- Times Up alert -->
   <div id="timesUpAlert">time’s up! take a break .𖥔 ݁ ˖</div>
+  <audio id="alarmSound" preload="auto">
+  <source src="alarm.mp3" type="audio/mpeg">
+</audio>
+
+<div id="dismissWrapper" style="display: none; margin-top: 10px;">
+  <button onclick="dismissAlarm()" style="padding: 8px 16px; border-radius: 9999px; background-color: var(--theme-button-bg); color: var(--theme-color); border: none; cursor: pointer;">Dismiss 🔕</button>
+</div>
+
 </div>
 
 <script>
@@ -265,12 +273,24 @@
     timeDisplay.textContent = `${m}:${s}`;
   }
 
-  function showTimesUp() {
-    timesUpAlert.style.display = 'block';
-    setTimeout(() => {
-      timesUpAlert.style.display = 'none';
-    }, 3000);
-  }
+ function showTimesUp() {
+  timesUpAlert.style.display = 'block';
+  document.getElementById('dismissWrapper').style.display = 'block';
+
+  const alarm = document.getElementById('alarmSound');
+  alarm.play().catch(error => {
+    console.log("Audio play failed:", error);
+  });
+}
+function dismissAlarm() {
+  const alarm = document.getElementById('alarmSound');
+  alarm.pause();
+  alarm.currentTime = 0;
+
+  timesUpAlert.style.display = 'none';
+  document.getElementById('dismissWrapper').style.display = 'none';
+}
+
 
   startBtn.addEventListener('click', () => {
     if (countdown) clearInterval(countdown);
