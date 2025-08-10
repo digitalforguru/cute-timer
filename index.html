@@ -1,46 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Focus Time</title>
-<style>
-  /* your entire existing style block remains unchanged */
-  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap');
-  /* ... STYLES OMITTED HERE FOR BREVITY ... */
-</style>
-</head>
-<body>
-
-<div class="widget-wrapper" id="widget">
-  <h1>---- focus timer ----</h1>
-  <div>
-    <select id="minutes">
-      <option value="5">5 min</option>
-      <option value="10">10 min</option>
-      <option value="15">15 min</option>
-      <option value="20">20 min</option>
-      <option value="30">30 min</option>
-    </select>
-    <button id="start">Start</button>
-    <button id="reset">Reset</button>
-  </div>
-  <div id="time">00:00</div>
-
-  <div class="theme-circle" id="themeToggle" title="Change theme"></div>
-
-  <div class="theme-menu" id="themeMenu">
-    <div class="theme-option" data-theme="beige" style="background-color:#d0bba8;"></div>
-    <div class="theme-option" data-theme="pink" style="background-color:#ffe7f5;"></div>
-    <div class="theme-option" data-theme="blue" style="background-color:#dceaf5;"></div>
-    <div class="theme-option" data-theme="purple" style="background-color:#f6e5fc;"></div>
-    <div class="theme-option" data-theme="green" style="background-color:#daece1;"></div>
-  </div>
-</div>
-
-<div id="timesUpAlert">time’s up! take a break .𖥔 ݁ ˖</div>
-
-<audio id="lofiAudio" src="Lowtone%20Music%20-%20Lofi%20Short%20Version.mp3" preload="auto"></audio>
+<!-- Everything above this point stays exactly the same -->
 
 <script>
   const startBtn = document.getElementById('start');
@@ -53,7 +11,7 @@
   const timesUpAlert = document.getElementById('timesUpAlert');
   const lofiAudio = document.getElementById('lofiAudio');
 
-  let countdown = null;
+  let countdown;
   let totalSeconds = 0;
   let remainingSeconds = 0;
   let isRunning = false;
@@ -114,12 +72,6 @@
     themeMenu.style.display = themeMenu.style.display === 'block' ? 'none' : 'block';
   });
 
-  document.addEventListener('click', (e) => {
-    if (!themeMenu.contains(e.target) && e.target !== themeToggle) {
-      themeMenu.style.display = 'none';
-    }
-  });
-
   document.querySelectorAll('.theme-option').forEach(option => {
     option.addEventListener('click', e => {
       const selectedTheme = e.target.getAttribute('data-theme');
@@ -136,25 +88,23 @@
 
   function showTimesUp() {
     timesUpAlert.style.display = 'block';
-    lofiAudio.play().catch(e => console.log('Audio play error:', e));
+    lofiAudio.play().catch(err => console.warn('Autoplay blocked or error:', err));
     setTimeout(() => {
       timesUpAlert.style.display = 'none';
     }, 3000);
   }
 
   startBtn.addEventListener('click', () => {
-    if (isRunning) return;
-    isRunning = true;
+    if (isRunning) return; // prevent multiple timers
     if (countdown) clearInterval(countdown);
-
     totalSeconds = parseInt(minutesSelect.value) * 60;
     remainingSeconds = totalSeconds;
     updateDisplay(remainingSeconds);
+    isRunning = true;
 
     countdown = setInterval(() => {
       remainingSeconds--;
       updateDisplay(remainingSeconds);
-
       if (remainingSeconds <= 0) {
         clearInterval(countdown);
         isRunning = false;
@@ -165,12 +115,14 @@
 
   resetBtn.addEventListener('click', () => {
     if (countdown) clearInterval(countdown);
-    isRunning = false;
     remainingSeconds = 0;
     updateDisplay(0);
+    isRunning = false;
+    lofiAudio.pause();
+    lofiAudio.currentTime = 0;
   });
 
   updateDisplay(0);
 </script>
-</body>
-</html>
+
+<audio id="lofiAudio" src="Lowtone%20Music%20-%20Lofi%20Short%20Version.mp3" preload="auto"></audio>
