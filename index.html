@@ -40,6 +40,9 @@
     color: var(--pink-text);
     position: relative;
     user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   h1 {
@@ -69,6 +72,7 @@
     align-items: center;
     color: inherit;
     position: relative;
+    width: 100%;
   }
 
   .theme-beige {
@@ -127,8 +131,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, border-color 0.3s ease;
     color: var(--themeDotColor);
+    z-index: 20;
   }
 
   #themeBtn::before {
@@ -193,18 +198,20 @@
     display: flex;
   }
   #modal {
-    background: white;
+    background: var(--modal-bg, white);
     padding: 24px 36px;
     border-radius: 1rem;
     box-shadow: 0 6px 15px rgba(179, 74, 105, 0.25);
     font-family: 'Quicksand', sans-serif;
     font-weight: 500;
     font-size: 1.2rem;
-    color: #b34a69;
+    color: var(--modal-text, #b34a69);
     text-align: center;
     opacity: 0;
     transform: scale(0.9);
     animation: fadeInScale 0.3s forwards;
+    max-width: 280px;
+    box-sizing: border-box;
   }
   #modal button {
     margin-top: 16px;
@@ -263,7 +270,7 @@
 </head>
 <body>
   <div class="widget-wrapper" id="widget">
-    <h1>.𖥔 ݁ focus timer .𖥔 ݁</h1>
+    <h1>.𖥔 focus timer .𖥔</h1>
     <div id="time">00:00</div>
 
     <div class="color-box theme-pink" id="colorBox">
@@ -279,27 +286,26 @@
         <button id="reset">Reset</button>
       </div>
 
-      <button id="themeBtn" title="Choose Theme"></button>
-      <div id="themeOptions">
-        <div class="theme-circle theme-beige-circle" data-theme="beige" title="Beige"></div>
-        <div class="theme-circle theme-pink-circle" data-theme="pink" title="Pink"></div>
-        <div class="theme-circle theme-blue-circle" data-theme="blue" title="Blue"></div>
-        <div class="theme-circle theme-purple-circle" data-theme="purple" title="Purple"></div>
-        <div class="theme-circle theme-green-circle" data-theme="green" title="Green"></div>
+      <button id="themeBtn" title="Choose Theme" aria-label="Choose Theme"></button>
+      <div id="themeOptions" role="menu" aria-hidden="true">
+        <div class="theme-circle theme-beige-circle" data-theme="beige" title="Beige" role="menuitem" tabindex="0"></div>
+        <div class="theme-circle theme-pink-circle" data-theme="pink" title="Pink" role="menuitem" tabindex="0"></div>
+        <div class="theme-circle theme-blue-circle" data-theme="blue" title="Blue" role="menuitem" tabindex="0"></div>
+        <div class="theme-circle theme-purple-circle" data-theme="purple" title="Purple" role="menuitem" tabindex="0"></div>
+        <div class="theme-circle theme-green-circle" data-theme="green" title="Green" role="menuitem" tabindex="0"></div>
       </div>
     </div>
   </div>
 
   <!-- Modal -->
-  <div id="modalOverlay">
+  <div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalMessage" tabindex="-1">
     <div id="modal">
-      time’s up! take a break .𖥔 ݁ ˖
-      <br />
+      <div id="modalMessage">time’s up! take a break .𖥔 ݁ ˖</div>
       <button id="closeModal">Got it</button>
     </div>
   </div>
 
-  <audio id="endSound" src="https://www.orangefreesounds.com/wp-content/uploads/2016/05/Beep-tone.mp3" preload="auto"></audio>
+  <audio id="endSound" preload="auto"></audio>
 
 <script>
   const startBtn = document.getElementById('start');
@@ -314,9 +320,15 @@
   const modalOverlay = document.getElementById('modalOverlay');
   const closeModalBtn = document.getElementById('closeModal');
 
+  // Sound file (soft dainty beep)
+  const beepUrl = 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg';
+
   let countdown;
   let totalSeconds = 0;
   let remainingSeconds = 0;
+
+  // Set default theme
+  let currentTheme = 'pink';
 
   function updateDisplay(seconds) {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -324,53 +336,13 @@
     timeDisplay.textContent = `${m}:${s}`;
   }
 
-  startBtn.addEventListener('click', () => {
-    if (countdown) clearInterval(countdown);
-    totalSeconds = parseInt(minutesSelect.value) * 60;
-    remainingSeconds = totalSeconds;
-    updateDisplay(remainingSeconds);
-    countdown = setInterval(() => {
-      remainingSeconds--;
-      updateDisplay(remainingSeconds);
-      // Play sound & show modal at 0:01 instead of 0:00
-      if (remainingSeconds === 1) {
-        endSound.currentTime = 0;
-        endSound.play().catch(() => {});
-        showModal();
-      }
-      if (remainingSeconds <= 0) {
-        clearInterval(countdown);
-      }
-    }, 1000);
-  });
+  function setTheme(theme) {
+    currentTheme = theme;
 
-  resetBtn.addEventListener('click', () => {
-    if (countdown) clearInterval(countdown);
-    remainingSeconds = 0;
-    updateDisplay(0);
-    hideModal();
-  });
+    // Update color box theme classes
+    colorBox.className = 'color-box theme-' + theme;
 
-  themeBtn.addEventListener('click', () => {
-    themeOptions.classList.toggle('show');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!themeOptions.contains(e.target) && e.target !== themeBtn) {
-      themeOptions.classList.remove('show');
-    }
-  });
-
-  themeCircles.forEach(circle => {
-    circle.addEventListener('click', () => {
-      const selectedTheme = circle.getAttribute('data-theme');
-      colorBox.className = `color-box theme-${selectedTheme}`;
-      themeOptions.classList.remove('show');
-      updateThemeDot(selectedTheme);
-    });
-  });
-
-  function updateThemeDot(theme) {
+    // Update theme button color and border
     const themeColors = {
       beige: '#5d4c3a',
       pink: '#60355c',
@@ -381,21 +353,140 @@
     themeBtn.style.color = themeColors[theme];
     themeBtn.style.borderColor = themeColors[theme];
     themeBtn.style.setProperty('--themeDotColor', themeColors[theme]);
+
+    // Update modal colors dynamically using CSS vars
+    const modalBgColors = {
+      beige: 'var(--beige-bg)',
+      pink: 'var(--pink-bg)',
+      blue: 'var(--blue-bg)',
+      purple: 'var(--purple-bg)',
+      green: 'var(--green-bg)',
+    };
+    const modalTextColors = {
+      beige: 'var(--beige-text)',
+      pink: 'var(--pink-text)',
+      blue: 'var(--blue-text)',
+      purple: 'var(--purple-text)',
+      green: 'var(--green-text)',
+    };
+
+    // Apply CSS vars on modal dynamically for background & text
+    modalOverlay.style.setProperty('--modal-bg', getComputedStyle(document.documentElement).getPropertyValue(modalBgColors[theme]));
+    modalOverlay.style.setProperty('--modal-text', getComputedStyle(document.documentElement).getPropertyValue(modalTextColors[theme]));
+
+    // Also change body text color to theme text color for better overall consistency
+    document.body.style.color = themeColors[theme];
+
+    // Change select and button text colors inside colorBox for contrast
+    const controls = colorBox.querySelectorAll('select, button');
+    controls.forEach(ctrl => {
+      ctrl.style.color = themeColors[theme];
+    });
+
+    // Hide theme options after selection
+    hideModalOptions();
   }
 
   // Modal controls
   function showModal() {
     modalOverlay.classList.add('show');
+    modalOverlay.focus();
   }
   function hideModal() {
     modalOverlay.classList.remove('show');
   }
+
+  // Theme menu controls
+  function toggleThemeOptions() {
+    if (themeOptions.classList.contains('show')) {
+      themeOptions.classList.remove('show');
+      themeBtn.setAttribute('aria-expanded', 'false');
+      themeOptions.setAttribute('aria-hidden', 'true');
+    } else {
+      themeOptions.classList.add('show');
+      themeBtn.setAttribute('aria-expanded', 'true');
+      themeOptions.setAttribute('aria-hidden', 'false');
+    }
+  }
+  function hideModalOptions() {
+    themeOptions.classList.remove('show');
+    themeBtn.setAttribute('aria-expanded', 'false');
+    themeOptions.setAttribute('aria-hidden', 'true');
+  }
+
+  // Play beep sound, with error handling
+  function playSound() {
+    if (!endSound.src) {
+      endSound.src = beepUrl;
+    }
+    endSound.pause();
+    endSound.currentTime = 0;
+    const playPromise = endSound.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Audio play failed, ignore silently (user might need to interact first)
+      });
+    }
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    totalSeconds = parseInt(minutesSelect.value) * 60;
+    remainingSeconds = totalSeconds;
+    updateDisplay(remainingSeconds);
+    countdown = setInterval(() => {
+      remainingSeconds--;
+      updateDisplay(remainingSeconds);
+
+      if (remainingSeconds === 1) {
+        playSound();
+      }
+      if (remainingSeconds <= 0) {
+        clearInterval(countdown);
+        showModal();
+      }
+    }, 1000);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    remainingSeconds = 0;
+    updateDisplay(0);
+  });
+
   closeModalBtn.addEventListener('click', () => {
     hideModal();
   });
 
-  // Initialize display
+  themeBtn.addEventListener('click', () => {
+    toggleThemeOptions();
+  });
+
+  themeCircles.forEach(circle => {
+    circle.addEventListener('click', () => {
+      const selectedTheme = circle.getAttribute('data-theme');
+      setTheme(selectedTheme);
+    });
+    // Allow keyboard navigation for accessibility
+    circle.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const selectedTheme = circle.getAttribute('data-theme');
+        setTheme(selectedTheme);
+      }
+    });
+  });
+
+  // Clicking outside theme options closes it
+  document.addEventListener('click', (e) => {
+    if (!themeBtn.contains(e.target) && !themeOptions.contains(e.target)) {
+      hideModalOptions();
+    }
+  });
+
+  // Initialize display and theme
   updateDisplay(0);
+  setTheme(currentTheme);
 </script>
 </body>
 </html>
