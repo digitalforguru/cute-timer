@@ -37,19 +37,40 @@
 
   .widget-wrapper {
     width: 320px;
+    color: var(--pink-text);
+    position: relative;
+    user-select: none;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin: 0 0 8px 0;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+
+  #time {
+    font-size: 2.6rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    margin: 0 0 20px 0;
+    text-align: center;
+  }
+
+  .color-box {
     background: var(--pink-bg);
     border-radius: 1.5rem;
     box-shadow: 0 4px 12px rgba(179, 74, 105, 0.2);
-    padding: 24px 30px 40px 30px;
+    padding: 20px 24px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--pink-text);
+    color: inherit;
     position: relative;
   }
 
-  /* Theme backgrounds and text colors */
   .theme-beige {
     background: var(--beige-bg);
     color: var(--beige-text);
@@ -71,28 +92,10 @@
     color: var(--green-text);
   }
 
-  h1 {
-    font-size: 1.2rem;
-    font-weight: 300;
-    margin: 0 0 16px 0;
-    text-align: center;
-    letter-spacing: 0.1em;
-    user-select: none;
-  }
-
-  #time {
-    font-size: 2.6rem;
-    font-weight: 300;
-    letter-spacing: 0.05em;
-    margin: 0 0 24px 0;
-    user-select: none;
-  }
-
-  /* Controls container */
   .controls {
     display: flex;
     gap: 8px;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
   }
 
   select, button {
@@ -106,17 +109,15 @@
     color: inherit;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    user-select: none;
   }
   select:hover, button:hover {
     background-color: rgba(255 255 255 / 0.9);
   }
 
-  /* Theme button circle on top right */
   #themeBtn {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 16px;
+    right: 16px;
     width: 36px;
     height: 36px;
     background: transparent;
@@ -130,7 +131,6 @@
     color: var(--themeDotColor);
   }
 
-  /* The small filled dot inside the theme button */
   #themeBtn::before {
     content: "";
     position: absolute;
@@ -141,7 +141,6 @@
     pointer-events: none;
   }
 
-  /* Theme options menu */
   #themeOptions {
     position: absolute;
     top: 50%;
@@ -154,13 +153,11 @@
     gap: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     z-index: 10;
-    user-select: none;
   }
   #themeOptions.show {
     display: flex;
   }
 
-  /* Circles for each theme */
   .theme-circle {
     width: 32px;
     height: 32px;
@@ -173,26 +170,75 @@
     transform: scale(1.15);
   }
 
-  /* Each circle’s background color */
   .theme-beige-circle { background: var(--beige-bg); }
   .theme-pink-circle { background: var(--pink-bg); }
   .theme-blue-circle { background: var(--blue-bg); }
   .theme-purple-circle { background: var(--purple-bg); }
   .theme-green-circle { background: var(--green-bg); }
 
-  /* Responsive */
+  /* Modal for "Time's up" */
+  #modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom: 0;
+    background: rgba(0,0,0,0.15);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  #modalOverlay.show {
+    display: flex;
+  }
+  #modal {
+    background: white;
+    padding: 24px 36px;
+    border-radius: 1rem;
+    box-shadow: 0 6px 15px rgba(179, 74, 105, 0.25);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    font-size: 1.2rem;
+    color: #b34a69;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.9);
+    animation: fadeInScale 0.3s forwards;
+  }
+  #modal button {
+    margin-top: 16px;
+    background: #fcddec;
+    border: none;
+    border-radius: 9999px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #b34a69;
+    transition: background-color 0.3s ease;
+  }
+  #modal button:hover {
+    background-color: #f9bbca;
+  }
+
+  @keyframes fadeInScale {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
   @media (max-width: 400px) {
     .widget-wrapper {
       width: 90vw;
-      padding: 20px 18px 30px 18px;
     }
     h1 {
       font-size: 1rem;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
     #time {
       font-size: 2rem;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .controls {
       gap: 6px;
@@ -205,8 +251,8 @@
     #themeBtn {
       width: 30px;
       height: 30px;
-      top: 10px;
-      right: 10px;
+      top: 12px;
+      right: 12px;
     }
     #themeOptions .theme-circle {
       width: 26px;
@@ -216,28 +262,40 @@
 </style>
 </head>
 <body>
-  <div class="widget-wrapper theme-pink" id="widget">
-    <h1>---- focus timer ----</h1>
+  <div class="widget-wrapper" id="widget">
+    <h1>.𖥔 ݁ focus timer .𖥔 ݁</h1>
     <div id="time">00:00</div>
-    <div class="controls">
-      <select id="minutes">
-        <option value="5">5 min</option>
-        <option value="10">10 min</option>
-        <option value="15">15 min</option>
-        <option value="20">20 min</option>
-        <option value="30">30 min</option>
-      </select>
-      <button id="start">Start</button>
-      <button id="reset">Reset</button>
-    </div>
 
-    <button id="themeBtn" title="Choose Theme"></button>
-    <div id="themeOptions">
-      <div class="theme-circle theme-beige-circle" data-theme="beige" title="Beige"></div>
-      <div class="theme-circle theme-pink-circle" data-theme="pink" title="Pink"></div>
-      <div class="theme-circle theme-blue-circle" data-theme="blue" title="Blue"></div>
-      <div class="theme-circle theme-purple-circle" data-theme="purple" title="Purple"></div>
-      <div class="theme-circle theme-green-circle" data-theme="green" title="Green"></div>
+    <div class="color-box theme-pink" id="colorBox">
+      <div class="controls">
+        <select id="minutes">
+          <option value="5">5 min</option>
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+          <option value="20">20 min</option>
+          <option value="30">30 min</option>
+        </select>
+        <button id="start">Start</button>
+        <button id="reset">Reset</button>
+      </div>
+
+      <button id="themeBtn" title="Choose Theme"></button>
+      <div id="themeOptions">
+        <div class="theme-circle theme-beige-circle" data-theme="beige" title="Beige"></div>
+        <div class="theme-circle theme-pink-circle" data-theme="pink" title="Pink"></div>
+        <div class="theme-circle theme-blue-circle" data-theme="blue" title="Blue"></div>
+        <div class="theme-circle theme-purple-circle" data-theme="purple" title="Purple"></div>
+        <div class="theme-circle theme-green-circle" data-theme="green" title="Green"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalOverlay">
+    <div id="modal">
+      time’s up! take a break .𖥔 ݁ ˖
+      <br />
+      <button id="closeModal">Got it</button>
     </div>
   </div>
 
@@ -248,11 +306,13 @@
   const resetBtn = document.getElementById('reset');
   const timeDisplay = document.getElementById('time');
   const minutesSelect = document.getElementById('minutes');
-  const widget = document.getElementById('widget');
+  const colorBox = document.getElementById('colorBox');
   const themeBtn = document.getElementById('themeBtn');
   const themeOptions = document.getElementById('themeOptions');
   const themeCircles = document.querySelectorAll('.theme-circle');
   const endSound = document.getElementById('endSound');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const closeModalBtn = document.getElementById('closeModal');
 
   let countdown;
   let totalSeconds = 0;
@@ -272,10 +332,14 @@
     countdown = setInterval(() => {
       remainingSeconds--;
       updateDisplay(remainingSeconds);
+      // Play sound & show modal at 0:01 instead of 0:00
+      if (remainingSeconds === 1) {
+        endSound.currentTime = 0;
+        endSound.play().catch(() => {});
+        showModal();
+      }
       if (remainingSeconds <= 0) {
         clearInterval(countdown);
-        endSound.play().catch(() => {});  // Play beep sound when time is up
-        alert('time’s up! take a break .𖥔 ݁ ˖');
       }
     }, 1000);
   });
@@ -284,6 +348,7 @@
     if (countdown) clearInterval(countdown);
     remainingSeconds = 0;
     updateDisplay(0);
+    hideModal();
   });
 
   themeBtn.addEventListener('click', () => {
@@ -299,7 +364,7 @@
   themeCircles.forEach(circle => {
     circle.addEventListener('click', () => {
       const selectedTheme = circle.getAttribute('data-theme');
-      widget.className = `widget-wrapper theme-${selectedTheme}`;
+      colorBox.className = `color-box theme-${selectedTheme}`;
       themeOptions.classList.remove('show');
       updateThemeDot(selectedTheme);
     });
@@ -308,19 +373,3 @@
   function updateThemeDot(theme) {
     const themeColors = {
       beige: '#5d4c3a',
-      pink: '#60355c',
-      blue: '#4b5c74',
-      purple: '#7b5279',
-      green: '#5b6c5a'
-    };
-    const color = themeColors[theme] || '#60355c';
-    document.documentElement.style.setProperty('--themeDotColor', color);
-    themeBtn.style.color = color;
-  }
-
-  // Initialize default theme dot color
-  updateThemeDot('pink');
-  updateDisplay(0);
-</script>
-</body>
-</html>
