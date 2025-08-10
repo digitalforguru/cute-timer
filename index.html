@@ -60,6 +60,7 @@
     color: var(--theme-color);
   }
 
+  /* Theme selector circle inside widget bottom-right */
   .theme-circle {
     position: absolute;
     bottom: 15px;
@@ -77,6 +78,7 @@
     transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
+  /* Theme menu inside widget, centered */
   .theme-menu {
     position: absolute;
     top: 50%;
@@ -105,21 +107,22 @@
     transform: scale(1.2);
   }
 
+  /* Times Up alert style - centered inside the widget */
   #timesUpAlert {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: var(--theme-bg);
     color: var(--theme-color);
-    padding: 25px 35px;
-    border-radius: 1.2rem;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    padding: 20px 30px;
+    border-radius: 1rem;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
     font-family: 'Quicksand', sans-serif;
     font-weight: 300;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     display: none;
-    z-index: 100;
+    z-index: 20;
     text-align: center;
   }
 
@@ -160,8 +163,10 @@
   </div>
   <div id="time">00:00</div>
 
+  <!-- Theme selector button inside widget -->
   <div class="theme-circle" id="themeToggle" title="Change theme"></div>
 
+  <!-- Theme menu inside widget -->
   <div class="theme-menu" id="themeMenu">
     <div class="theme-option" data-theme="beige" style="background-color:#d0bba8;"></div>
     <div class="theme-option" data-theme="pink" style="background-color:#ffe7f5;"></div>
@@ -169,11 +174,10 @@
     <div class="theme-option" data-theme="purple" style="background-color:#f6e5fc;"></div>
     <div class="theme-option" data-theme="green" style="background-color:#daece1;"></div>
   </div>
+
+  <!-- Times Up alert -->
+  <div id="timesUpAlert">time’s up! take a break .𖥔 ݁ ˖</div>
 </div>
-
-<div id="timesUpAlert">time’s up! take a break .𖥔 ݁ ˖</div>
-
-<audio id="lofiAudio" src="Lowtone%20Music%20-%20Lofi%20Short%20Version.mp3" preload="auto"></audio>
 
 <script>
   const startBtn = document.getElementById('start');
@@ -184,7 +188,6 @@
   const themeMenu = document.getElementById('themeMenu');
   const widget = document.getElementById('widget');
   const timesUpAlert = document.getElementById('timesUpAlert');
-  const lofiAudio = document.getElementById('lofiAudio');
 
   let countdown;
   let totalSeconds = 0;
@@ -235,8 +238,10 @@
     widget.style.backgroundColor = t.bg;
     themeToggle.style.backgroundColor = t.bg;
     themeToggle.style.borderColor = 'white';
+
     timesUpAlert.style.backgroundColor = t.bg;
     timesUpAlert.style.color = t.color;
+
     currentTheme = theme;
   }
 
@@ -262,9 +267,6 @@
 
   function showTimesUp() {
     timesUpAlert.style.display = 'block';
-    lofiAudio.play().catch(err => {
-      console.warn("Audio couldn't play automatically:", err);
-    });
     setTimeout(() => {
       timesUpAlert.style.display = 'none';
     }, 3000);
@@ -290,8 +292,6 @@
     if (countdown) clearInterval(countdown);
     remainingSeconds = 0;
     updateDisplay(0);
-    lofiAudio.pause();
-    lofiAudio.currentTime = 0;
   });
 
   updateDisplay(0);
@@ -299,4 +299,3 @@
 
 </body>
 </html>
-
