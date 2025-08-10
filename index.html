@@ -3,80 +3,160 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Focus Time</title>
+<title>Focus Time - Themed Timer</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap');
+
   /* Wrapper to control size and aspect ratio */
   .widget-wrapper {
-    width: 100%;
-    max-width: 350px;          /* max width to keep it small */
-    aspect-ratio: 4 / 3;       /* maintain height proportional to width */
-    margin: 0 auto;            /* center horizontally */
-    overflow: hidden;
+    width: 280px;          /* smaller width */
+    aspect-ratio: 4 / 3;
+    margin: 30px auto;
     background: #f7f1e8;
     border-radius: 1.5rem;
-    box-shadow: 0 4px 12px rgba(179, 74, 105, 0.2);
+    box-shadow: 0 4px 12px rgba(179, 74, 105, 0.15);
     padding: 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     color: #b34a69;
+    position: relative;
+    user-select: none;
   }
 
+  /* Heading */
   h1 {
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    margin-bottom: 18px;
+    font-size: 1.4rem;
+    font-weight: 300;
     text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   select, button {
-    font-size: 1rem;           /* relative smaller font */
-    padding: 8px 12px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    padding: 7px 14px;
     border-radius: 9999px;
     border: none;
     background-color: #fcddec;
     color: #b34a69;
     cursor: pointer;
-    margin: 0 5px;
     transition: background-color 0.3s ease;
   }
   select:hover, button:hover {
     background-color: #f9bbca;
   }
 
+  /* Time display */
   #time {
-    font-size: 2.5rem;         /* smaller but still visible */
-    margin-top: 30px;
+    font-size: 2.3rem;
+    margin-top: 28px;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.07em;
   }
 
-  /* Responsive text scaling */
-  @media (max-width: 400px) {
+  /* Theme selector circle button */
+  #themeBtn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  #themeBtn:hover {
+    background-color: rgba(255 255 255 / 0.15);
+  }
+
+  /* Theme popup container */
+  #themePopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255 255 255 / 0.9);
+    border-radius: 1rem;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    padding: 20px 25px;
+    display: none;
+    flex-direction: row;
+    gap: 15px;
+    z-index: 100;
+  }
+
+  /* Theme circles inside popup */
+  .theme-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+  .theme-circle:hover, .theme-circle.selected {
+    border-color: #b34a69;
+  }
+
+  /* Theme colors */
+  .theme-beige { background-color: #d0bba8; }
+  .theme-pink { background-color: #ffe7f5; }
+  .theme-blue { background-color: #dceaf5; }
+  .theme-purple { background-color: #f6e5fc; }
+  .theme-green { background-color: #daece1; }
+
+  /* Responsive tweaks */
+  @media (max-width: 350px) {
     .widget-wrapper {
-      max-width: 90vw;
-      padding: 15px;
+      width: 90vw;
+      padding: 16px;
     }
     h1 {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
     }
     select, button {
       font-size: 0.9rem;
-      padding: 6px 10px;
-      margin: 0 3px;
+      padding: 6px 12px;
     }
     #time {
       font-size: 2rem;
-      margin-top: 20px;
+      margin-top: 22px;
+    }
+    #themeBtn {
+      width: 32px;
+      height: 32px;
+      top: 12px;
+      right: 12px;
+    }
+    #themePopup {
+      padding: 15px 20px;
+      gap: 12px;
+    }
+    .theme-circle {
+      width: 28px;
+      height: 28px;
     }
   }
 </style>
 </head>
 <body>
-  <div class="widget-wrapper">
+  <div class="widget-wrapper" id="widgetWrapper">
     <h1>⊹₊⟡⋆ focus time ⋆⟡₊⊹</h1>
-    <div>
+    <div class="controls">
       <select id="minutes">
         <option value="5">5 min</option>
         <option value="10">10 min</option>
@@ -88,6 +168,18 @@
       <button id="reset">Reset</button>
     </div>
     <div id="time">00:00</div>
+
+    <!-- Theme selector button -->
+    <div id="themeBtn" title="Select theme"></div>
+
+    <!-- Theme popup with circles -->
+    <div id="themePopup" aria-label="Theme selector menu">
+      <div class="theme-circle theme-beige" data-theme="beige" title="Beige"></div>
+      <div class="theme-circle theme-pink" data-theme="pink" title="Pink"></div>
+      <div class="theme-circle theme-blue" data-theme="blue" title="Blue"></div>
+      <div class="theme-circle theme-purple" data-theme="purple" title="Purple"></div>
+      <div class="theme-circle theme-green" data-theme="green" title="Green"></div>
+    </div>
   </div>
 
 <script>
@@ -128,6 +220,86 @@
   });
 
   updateDisplay(0);
+
+  // Theme selector logic
+  const themeBtn = document.getElementById('themeBtn');
+  const themePopup = document.getElementById('themePopup');
+  const themeCircles = themePopup.querySelectorAll('.theme-circle');
+  const widgetWrapper = document.getElementById('widgetWrapper');
+
+  // Load saved theme or default
+  function applyTheme(theme) {
+    widgetWrapper.style.backgroundColor = '';
+    widgetWrapper.style.color = '';
+    widgetWrapper.style.boxShadow = '';
+    switch(theme) {
+      case 'beige':
+        widgetWrapper.style.backgroundColor = '#d0bba8';
+        widgetWrapper.style.color = '#5d4c3a';
+        widgetWrapper.style.boxShadow = '0 4px 12px rgba(93, 76, 58, 0.2)';
+        break;
+      case 'pink':
+        widgetWrapper.style.backgroundColor = '#ffe7f5';
+        widgetWrapper.style.color = '#60355c';
+        widgetWrapper.style.boxShadow = '0 4px 12px rgba(96, 53, 92, 0.2)';
+        break;
+      case 'blue':
+        widgetWrapper.style.backgroundColor = '#dceaf5';
+        widgetWrapper.style.color = '#4b5c74';
+        widgetWrapper.style.boxShadow = '0 4px 12px rgba(75, 92, 116, 0.2)';
+        break;
+      case 'purple':
+        widgetWrapper.style.backgroundColor = '#f6e5fc';
+        widgetWrapper.style.color = '#7b5279';
+        widgetWrapper.style.boxShadow = '0 4px 12px rgba(123, 82, 121, 0.2)';
+        break;
+      case 'green':
+        widgetWrapper.style.backgroundColor = '#daece1';
+        widgetWrapper.style.color = '#5b6c5a';
+        widgetWrapper.style.boxShadow = '0 4px 12px rgba(91, 108, 90, 0.2)';
+        break;
+      default:
+        widgetWrapper.style.backgroundColor = '#f7f1e8';
+        widgetWrapper.style.color = '#b34a69';
+        widgetWrapper.style.boxShadow = '0 4px 12px rgba(179, 74, 105, 0.15)';
+    }
+  }
+
+  // Initialize theme from localStorage or default pink
+  let savedTheme = localStorage.getItem('focusTimerTheme') || 'pink';
+  applyTheme(savedTheme);
+
+  // Mark selected circle
+  function markSelected(theme) {
+    themeCircles.forEach(circle => {
+      circle.classList.toggle('selected', circle.dataset.theme === theme);
+    });
+  }
+  markSelected(savedTheme);
+
+  // Toggle popup menu on theme button click
+  themeBtn.addEventListener('click', () => {
+    themePopup.style.display = themePopup.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  // Handle theme circle clicks
+  themeCircles.forEach(circle => {
+    circle.addEventListener('click', () => {
+      const selectedTheme = circle.dataset.theme;
+      applyTheme(selectedTheme);
+      markSelected(selectedTheme);
+      localStorage.setItem('focusTimerTheme', selectedTheme);
+      themePopup.style.display = 'none';
+    });
+  });
+
+  // Optional: close popup if click outside
+  document.addEventListener('click', (e) => {
+    if (!themeBtn.contains(e.target) && !themePopup.contains(e.target)) {
+      themePopup.style.display = 'none';
+    }
+  });
 </script>
 </body>
 </html>
+
