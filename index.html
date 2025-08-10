@@ -373,3 +373,29 @@
   function updateThemeDot(theme) {
     const themeColors = {
       beige: '#5d4c3a',
+      pink: '#60355c',
+      blue: '#4b5c74',
+      purple: '#7b5279',
+      green: '#5b6c5a',
+    };
+    themeBtn.style.color = themeColors[theme];
+    themeBtn.style.borderColor = themeColors[theme];
+    themeBtn.style.setProperty('--themeDotColor', themeColors[theme]);
+  }
+
+  // Modal controls
+  function showModal() {
+    modalOverlay.classList.add('show');
+  }
+  function hideModal() {
+    modalOverlay.classList.remove('show');
+  }
+  closeModalBtn.addEventListener('click', () => {
+    hideModal();
+  });
+
+  // Initialize display
+  updateDisplay(0);
+</script>
+</body>
+</html>
