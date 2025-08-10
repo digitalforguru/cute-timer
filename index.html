@@ -281,10 +281,11 @@
     countdown = setInterval(() => {
       remainingSeconds--;
       updateDisplay(remainingSeconds);
-      if (remainingSeconds <= 0) {
-        clearInterval(countdown);
-        showTimesUp();
-      }
+     if (remainingSeconds <= 0) {
+  clearInterval(countdown);
+  showTimesUp();
+  document.getElementById("lofiAudio").play(Lowtone%20Music%20-%20Lofi%20Short%20Version.mp3); // <-- Add this line to play audio
+}
     }, 1000);
   });
 
@@ -296,6 +297,6 @@
 
   updateDisplay(0);
 </script>
-
+<audio id="lofiAudio" src="Lowtone%20Music%20-%20Lofi%20Short%20Version.mp3"></audio>
 </body>
 </html>
