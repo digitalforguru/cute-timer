@@ -1,161 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focus Timer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #ffe7f5;
-      --text-color: #60355c;
-      --accent-bg: #fcddec;
-      --accent-hover: #f9bbca;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Focus Time</title>
 
-    body {
-      background: transparent;
-      margin: 0;
-      font-family: 'Quicksand', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<!-- Quicksand font -->
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap" rel="stylesheet" />
 
+<style>
+  :root {
+    --beige-bg: #d0bba8;
+    --pink-bg: #ffe7f5;
+    --blue-bg: #dceaf5;
+    --purple-bg: #f6e5fc;
+    --green-bg: #daece1;
+
+    --beige-text: #5d4c3a;
+    --pink-text: #60355c;
+    --blue-text: #4b5c74;
+    --purple-text: #7b5279;
+    --green-text: #5b6c5a;
+
+    --themeDotColor: #60355c; /* default pink */
+  }
+
+  body {
+    background: #f7f1e8;
+    font-family: 'Quicksand', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .widget-wrapper {
+    width: 320px;
+    background: var(--pink-bg);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 12px rgba(179, 74, 105, 0.2);
+    padding: 24px 30px 40px 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--pink-text);
+    position: relative;
+  }
+
+  /* Theme backgrounds and text colors */
+  .theme-beige {
+    background: var(--beige-bg);
+    color: var(--beige-text);
+  }
+  .theme-pink {
+    background: var(--pink-bg);
+    color: var(--pink-text);
+  }
+  .theme-blue {
+    background: var(--blue-bg);
+    color: var(--blue-text);
+  }
+  .theme-purple {
+    background: var(--purple-bg);
+    color: var(--purple-text);
+  }
+  .theme-green {
+    background: var(--green-bg);
+    color: var(--green-text);
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin: 0 0 16px 0;
+    text-align: center;
+    letter-spacing: 0.1em;
+    user-select: none;
+  }
+
+  #time {
+    font-size: 2.6rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    margin: 0 0 24px 0;
+    user-select: none;
+  }
+
+  /* Controls container */
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  select, button {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 300;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    border: none;
+    background-color: rgba(255 255 255 / 0.7);
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  select:hover, button:hover {
+    background-color: rgba(255 255 255 / 0.9);
+  }
+
+  /* Theme button circle on top right */
+  #themeBtn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: color 0.3s ease;
+    color: var(--themeDotColor);
+  }
+
+  /* The small filled dot inside the theme button */
+  #themeBtn::before {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--themeDotColor);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Theme options menu */
+  #themeOptions {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255 255 255 / 0.85);
+    border-radius: 1rem;
+    padding: 14px 20px;
+    display: none;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 10;
+    user-select: none;
+  }
+  #themeOptions.show {
+    display: flex;
+  }
+
+  /* Circles for each theme */
+  .theme-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .theme-circle:hover {
+    transform: scale(1.15);
+  }
+
+  /* Each circle’s background color */
+  .theme-beige-circle { background: var(--beige-bg); }
+  .theme-pink-circle { background: var(--pink-bg); }
+  .theme-blue-circle { background: var(--blue-bg); }
+  .theme-purple-circle { background: var(--purple-bg); }
+  .theme-green-circle { background: var(--green-bg); }
+
+  /* Responsive */
+  @media (max-width: 400px) {
     .widget-wrapper {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      width: 100%;
-      max-width: 280px;
-      aspect-ratio: 4 / 3;
-      border-radius: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 16px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      text-align: center;
+      width: 90vw;
+      padding: 20px 18px 30px 18px;
     }
-
     h1 {
       font-size: 1rem;
-      font-weight: 400;
-      margin: 0 0 12px;
-      text-transform: lowercase;
-      letter-spacing: 0.05em;
+      margin-bottom: 12px;
     }
-
-    select, button {
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      border: none;
-      background-color: var(--accent-bg);
-      color: var(--text-color);
-      cursor: pointer;
-      margin: 0 3px;
-      transition: background-color 0.3s ease;
-    }
-
-    select:hover, button:hover {
-      background-color: var(--accent-hover);
-    }
-
     #time {
       font-size: 2rem;
-      font-weight: 600;
-      margin-top: 20px;
-      letter-spacing: 0.05em;
+      margin-bottom: 20px;
     }
-
-    .theme-toggle-btn {
-      position: absolute;
+    .controls {
+      gap: 6px;
+      margin-bottom: 30px;
+    }
+    select, button {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+    }
+    #themeBtn {
+      width: 30px;
+      height: 30px;
       top: 10px;
       right: 10px;
+    }
+    #themeOptions .theme-circle {
       width: 26px;
       height: 26px;
-      border: 1px solid white;
-      border-radius: 50%;
-      background-color: transparent;
-      cursor: pointer;
     }
-
-    .theme-options {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: none;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 130px;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 10px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      z-index: 10;
-    }
-
-    .theme-options.active {
-      display: flex;
-    }
-
-    .theme-circle {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid white;
-      cursor: pointer;
-    }
-
-    .theme-circle[data-theme="pink"]    { background-color: #ffe7f5; }
-    .theme-circle[data-theme="beige"]   { background-color: #d0bba8; }
-    .theme-circle[data-theme="blue"]    { background-color: #dceaf5; }
-    .theme-circle[data-theme="purple"]  { background-color: #f6e5fc; }
-    .theme-circle[data-theme="green"]   { background-color: #daece1; }
-
-    @media (max-width: 400px) {
-      .widget-wrapper {
-        max-width: 90vw;
-        padding: 10px;
-      }
-
-      h1 {
-        font-size: 0.9rem;
-      }
-
-      #time {
-        font-size: 1.8rem;
-      }
-
-      select, button {
-        font-size: 0.7rem;
-        padding: 3px 8px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="widget-wrapper">
-    <h1>⟡⋆ focus time ⋆⟡</h1>
-
-    <!-- Theme Toggle Button -->
-    <div class="theme-toggle-btn" title="Pick Theme"></div>
-
-    <!-- Theme Options -->
-    <div class="theme-options">
-      <div class="theme-circle" data-theme="pink" title="Pink"></div>
-      <div class="theme-circle" data-theme="beige" title="Beige"></div>
-      <div class="theme-circle" data-theme="blue" title="Blue"></div>
-      <div class="theme-circle" data-theme="purple" title="Purple"></div>
-      <div class="theme-circle" data-theme="green" title="Green"></div>
-    </div>
-
-    <div>
+  <div class="widget-wrapper theme-pink" id="widget">
+    <h1>---- focus timer ----</h1>
+    <div id="time">00:00</div>
+    <div class="controls">
       <select id="minutes">
         <option value="5">5 min</option>
         <option value="10">10 min</option>
@@ -166,97 +230,97 @@
       <button id="start">Start</button>
       <button id="reset">Reset</button>
     </div>
-    <div id="time">00:00</div>
+
+    <button id="themeBtn" title="Choose Theme"></button>
+    <div id="themeOptions">
+      <div class="theme-circle theme-beige-circle" data-theme="beige" title="Beige"></div>
+      <div class="theme-circle theme-pink-circle" data-theme="pink" title="Pink"></div>
+      <div class="theme-circle theme-blue-circle" data-theme="blue" title="Blue"></div>
+      <div class="theme-circle theme-purple-circle" data-theme="purple" title="Purple"></div>
+      <div class="theme-circle theme-green-circle" data-theme="green" title="Green"></div>
+    </div>
   </div>
 
-  <script>
-    const startBtn = document.getElementById('start');
-    const resetBtn = document.getElementById('reset');
-    const timeDisplay = document.getElementById('time');
-    const minutesSelect = document.getElementById('minutes');
+  <audio id="endSound" src="https://www.orangefreesounds.com/wp-content/uploads/2016/05/Beep-tone.mp3" preload="auto"></audio>
 
-    let countdown;
-    let totalSeconds = 0;
-    let remainingSeconds = 0;
+<script>
+  const startBtn = document.getElementById('start');
+  const resetBtn = document.getElementById('reset');
+  const timeDisplay = document.getElementById('time');
+  const minutesSelect = document.getElementById('minutes');
+  const widget = document.getElementById('widget');
+  const themeBtn = document.getElementById('themeBtn');
+  const themeOptions = document.getElementById('themeOptions');
+  const themeCircles = document.querySelectorAll('.theme-circle');
+  const endSound = document.getElementById('endSound');
 
-    function updateDisplay(seconds) {
-      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-      const s = (seconds % 60).toString().padStart(2, '0');
-      timeDisplay.textContent = `${m}:${s}`;
-    }
+  let countdown;
+  let totalSeconds = 0;
+  let remainingSeconds = 0;
 
-    startBtn.addEventListener('click', () => {
-      if (countdown) clearInterval(countdown);
-      totalSeconds = parseInt(minutesSelect.value) * 60;
-      remainingSeconds = totalSeconds;
+  function updateDisplay(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    timeDisplay.textContent = `${m}:${s}`;
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    totalSeconds = parseInt(minutesSelect.value) * 60;
+    remainingSeconds = totalSeconds;
+    updateDisplay(remainingSeconds);
+    countdown = setInterval(() => {
+      remainingSeconds--;
       updateDisplay(remainingSeconds);
-      countdown = setInterval(() => {
-        remainingSeconds--;
-        updateDisplay(remainingSeconds);
-        if (remainingSeconds <= 0) {
-          clearInterval(countdown);
-          alert('Time’s up! Take a break ✿');
-        }
-      }, 1000);
-    });
-
-    resetBtn.addEventListener('click', () => {
-      if (countdown) clearInterval(countdown);
-      remainingSeconds = 0;
-      updateDisplay(0);
-    });
-
-    updateDisplay(0);
-
-    // Theme Logic
-    const themeMap = {
-      beige: {
-        "--bg-color": "#d0bba8",
-        "--text-color": "#5d4c3a",
-        "--accent-bg": "#f1e2d0",
-        "--accent-hover": "#e3cbb1",
-      },
-      pink: {
-        "--bg-color": "#ffe7f5",
-        "--text-color": "#60355c",
-        "--accent-bg": "#fcddec",
-        "--accent-hover": "#f9bbca",
-      },
-      blue: {
-        "--bg-color": "#dceaf5",
-        "--text-color": "#4b5c74",
-        "--accent-bg": "#cfe0f0",
-        "--accent-hover": "#b8cce0",
-      },
-      purple: {
-        "--bg-color": "#f6e5fc",
-        "--text-color": "#7b5279",
-        "--accent-bg": "#ead3f5",
-        "--accent-hover": "#d7bce6",
-      },
-      green: {
-        "--bg-color": "#daece1",
-        "--text-color": "#5b6c5a",
-        "--accent-bg": "#cce0d4",
-        "--accent-hover": "#b7d1c1",
+      if (remainingSeconds <= 0) {
+        clearInterval(countdown);
+        endSound.play().catch(() => {});  // Play beep sound when time is up
+        alert('time’s up! take a break .𖥔 ݁ ˖');
       }
+    }, 1000);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    remainingSeconds = 0;
+    updateDisplay(0);
+  });
+
+  themeBtn.addEventListener('click', () => {
+    themeOptions.classList.toggle('show');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!themeOptions.contains(e.target) && e.target !== themeBtn) {
+      themeOptions.classList.remove('show');
+    }
+  });
+
+  themeCircles.forEach(circle => {
+    circle.addEventListener('click', () => {
+      const selectedTheme = circle.getAttribute('data-theme');
+      widget.className = `widget-wrapper theme-${selectedTheme}`;
+      themeOptions.classList.remove('show');
+      updateThemeDot(selectedTheme);
+    });
+  });
+
+  function updateThemeDot(theme) {
+    const themeColors = {
+      beige: '#5d4c3a',
+      pink: '#60355c',
+      blue: '#4b5c74',
+      purple: '#7b5279',
+      green: '#5b6c5a'
     };
+    const color = themeColors[theme] || '#60355c';
+    document.documentElement.style.setProperty('--themeDotColor', color);
+    themeBtn.style.color = color;
+  }
 
-    document.querySelectorAll(".theme-circle").forEach(circle => {
-      circle.addEventListener("click", () => {
-        const theme = circle.dataset.theme;
-        const root = document.documentElement;
-        const styles = themeMap[theme];
-        for (const key in styles) {
-          root.style.setProperty(key, styles[key]);
-        }
-        document.querySelector(".theme-options").classList.remove("active");
-      });
-    });
-
-    document.querySelector(".theme-toggle-btn").addEventListener("click", () => {
-      document.querySelector(".theme-options").classList.toggle("active");
-    });
-  </script>
+  // Initialize default theme dot color
+  updateThemeDot('pink');
+  updateDisplay(0);
+</script>
 </body>
 </html>
