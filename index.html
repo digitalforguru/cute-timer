@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Focus Time</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap');
+
+  /* Wrapper to control size and aspect ratio */
+  .widget-wrapper {
+    width: 100%;
+    max-width: 350px;          /* max width to keep it small */
+    aspect-ratio: 4 / 3;       /* maintain height proportional to width */
+    margin: 0 auto;            /* center horizontally */
+    overflow: hidden;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 12px rgba(179, 74, 105, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Quicksand', sans-serif;
+    color: #b34a69;
+    background-color: var(--theme-bg, #f7f1e8);
+    transition: background-color 0.3s ease;
+  }
+
+  h1 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 300;
+  }
+
+  select, button {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 300;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    border: none;
+    background-color: var(--theme-button-bg, #fcddec);
+    color: var(--theme-color, #b34a69);
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+  }
+  select:hover, button:hover {
+    background-color: var(--theme-button-hover, #f9bbca);
+  }
+
+  #time {
+    font-size: 2.3rem;
+    margin-top: 10px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  /* Theme selector circle */
+  .theme-circle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background-color: var(--theme-bg, #f7f1e8);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Theme menu in center */
+  .theme-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--theme-bg, #f7f1e8);
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    padding: 15px 20px;
+    display: none;
+    z-index: 1100;
+  }
+
+  .theme-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 0 8px;
+    border: 2px solid white;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .theme-option:hover {
+    transform: scale(1.2);
+    transition: transform 0.2s ease;
+  }
+
+  /* Responsive */
+  @media (max-width: 400px) {
+    .widget-wrapper {
+      max-width: 90vw;
+      padding: 15px;
+    }
+    h1 {
+      font-size: 1rem;
+    }
+    select, button {
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      margin: 0 3px;
+    }
+    #time {
+      font-size: 1.8rem;
+      margin-top: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="widget-wrapper" id="widget">
+
+  <h1>⋆˙⟡ focus timer ⋆˙⟡</h1>
+  <div>
+    <select id="minutes">
+      <option value="5">5 min</option>
+      <option value="10">10 min</option>
+      <option value="15">15 min</option>
+      <option value="20">20 min</option>
+      <option value="30">30 min</option>
+    </select>
+    <button id="start">Start</button>
+    <button id="reset">Reset</button>
+  </div>
+  <div id="time">00:00</div>
+</div>
+
+<!-- Theme selector button -->
+<div class="theme-circle" id="themeToggle"></div>
+
+<!-- Theme menu -->
+<div class="theme-menu" id="themeMenu">
+  <div class="theme-option" data-theme="beige" style="background-color:#d0bba8;"></div>
+  <div class="theme-option" data-theme="pink" style="background-color:#ffe7f5;"></div>
+  <div class="theme-option" data-theme="blue" style="background-color:#dceaf5;"></div>
+  <div class="theme-option" data-theme="purple" style="background-color:#f6e5fc;"></div>
+  <div class="theme-option" data-theme="green" style="background-color:#daece1;"></div>
+</div>
+
+<audio id="endSound" preload="auto">
+  <source src="https://www.orangefreesounds.com/wp-content/uploads/2016/05/Beep-tone.mp3" type="audio/mpeg" />
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+  const startBtn = document.getElementById('start');
+  const resetBtn = document.getElementById('reset');
+  const timeDisplay = document.getElementById('time');
+  const minutesSelect = document.getElementById('minutes');
+  const endSound = document.getElementById('endSound');
+  const themeToggle = document.getElementById('themeToggle');
+  const themeMenu = document.getElementById('themeMenu');
+  const widget = document.getElementById('widget');
+
+  let countdown;
+  let totalSeconds = 0;
+  let remainingSeconds = 0;
+  let userInteracted = false;
+
+  const themes = {
+    beige: {
+      bg: '#d0bba8',
+      buttonBg: '#e9d9c9',
+      buttonHover: '#d4c1a9',
+      color: '#5a4631',
+    },
+    pink: {
+      bg: '#ffe7f5',
+      buttonBg: '#ffd5e8',
+      buttonHover: '#ffb8d8',
+      color: '#9e3a63',
+    },
+    blue: {
+      bg: '#dceaf5',
+      buttonBg: '#b9d0f2',
+      buttonHover: '#91b5f7',
+      color: '#2c3e70',
+    },
+    purple: {
+      bg: '#f6e5fc',
+      buttonBg: '#e5d3f9',
+      buttonHover: '#d0b7f7',
+      color: '#5e3d91',
+    },
+    green: {
+      bg: '#daece1',
+      buttonBg: '#b7d9c1',
+      buttonHover: '#95c0a0',
+      color: '#3a5f43',
+    },
+  };
+
+  // Default theme
+  let currentTheme = 'beige';
+
+  // Apply theme CSS variables
+  function applyTheme(theme) {
+    const t = themes[theme];
+    if (!t) return;
+    document.documentElement.style.setProperty('--theme-bg', t.bg);
+    document.documentElement.style.setProperty('--theme-button-bg', t.buttonBg);
+    document.documentElement.style.setProperty('--theme-button-hover', t.buttonHover);
+    document.documentElement.style.setProperty('--theme-color', t.color);
+    widget.style.backgroundColor = t.bg;
+    themeToggle.style.backgroundColor = t.bg;
+    themeToggle.style.borderColor = 'white';
+
+    currentTheme = theme;
+  }
+
+  // Initialize theme selector circle color
+  applyTheme(currentTheme);
+
+  // Toggle theme menu visibility
+  themeToggle.addEventListener('click', () => {
+    if (themeMenu.style.display === 'block') {
+      themeMenu.style.display = 'none';
+    } else {
+      themeMenu.style.display = 'block';
+    }
+  });
+
+  // Theme option click handler
+  document.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', (e) => {
+      const selectedTheme = e.target.getAttribute('data-theme');
+      applyTheme(selectedTheme);
+      themeMenu.style.display = 'none';
+    });
+  });
+
+  // Update timer display
+  function updateDisplay(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    timeDisplay.textContent = `${m}:${s}`;
+  }
+
+  // Show alert only once per session if audio play blocked
+  function showAudioBlockedAlert() {
+    if (!sessionStorage.getItem('audioBlockedAlertShown')) {
+      alert('Please interact with the page (click Start) to enable sound playback.');
+      sessionStorage.setItem('audioBlockedAlertShown', 'true');
+    }
+  }
+
+  // Play sound safely
+  function playEndSound() {
+    endSound.play().catch(() => {
+      showAudioBlockedAlert();
+    });
+  }
+
+  // Mark user interaction to unlock audio permission
+  function onUserInteract() {
+    if (!userInteracted) {
+      userInteracted = true;
+      // Try to play and immediately pause to unlock audio on some browsers
+      endSound.play().then(() => {
+        endSound.pause();
+        endSound.currentTime = 0;
+      }).catch(() => {
+        // ignore error here, alert will show if play fails on end
+      });
+    }
+  }
+
+  startBtn.addEventListener('click', () => {
+    onUserInteract();
+
+    if (countdown) clearInterval(countdown);
+    totalSeconds = parseInt(minutesSelect.value) * 60;
+    remainingSeconds = totalSeconds;
+    updateDisplay(remainingSeconds);
+
+    countdown = setInterval(() => {
+      remainingSeconds--;
+      updateDisplay(remainingSeconds);
+      if (remainingSeconds === 1) {
+        // play sound at 0:01
+        playEndSound();
+      }
+      if (remainingSeconds <= 0) {
+        clearInterval(countdown);
+        showTimeUpMessage();
+      }
+    }, 1000);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (countdown) clearInterval(countdown);
+    remainingSeconds = 0;
+    updateDisplay(0);
+  });
+
+  // Custom popup message
+  function showTimeUpMessage() {
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = 0;
+    modal.style.left = 0;
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.3)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1200';
+
+    // Popup box
+    const box = document.createElement('div');
+    box.style.backgroundColor = themes[currentTheme].bg;
+    box.style.color = themes[currentTheme].color;
+    box.style.padding = '20px 30px';
+    box.style.borderRadius = '1rem';
+    box.style.boxShadow = '0 6px 18px rgba(0,0,0,0.15)';
+    box.style.fontFamily = "'Quicksand', sans-serif";
+    box.style.textAlign = 'center';
+    box.style.fontWeight = '300';
+    box.style.fontSize = '1.3rem';
+    box.textContent = 'time’s up! take a break .𖥔 ݁ ˖';
+
+    // Close on click anywhere
+    modal.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+  }
+
+  // Init display
+  updateDisplay(0);
+
+</script>
+</body>
+</html>
